@@ -76,6 +76,7 @@ public class GrigliaDP {
 
 
     private void listaDaIstanziare(Azienda azienda) {
+        System.out.println(tipo);
         ArrayList<Dipendente> dipendenti;
         ArrayList<Progetto> progetti;
         if (tipo == "Dipendenti") {
@@ -84,29 +85,41 @@ public class GrigliaDP {
         }
         else {
             progetti = azienda.progetti;
+            System.out.println("dio");
             creaGriglia(progetti);
         }
     }
 
     private void creaGriglia(ArrayList<?> lista) {
         
-        lista.forEach(i -> System.out.println(i));
+        //lista.forEach(i -> System.out.println(i));
         griglia = new JPanel();
         griglia.setSize(1200, 1200);
         
-        
-        griglia.setLayout(new GridLayout(lista.size() + 1, 5));
+        if (tipo == "Dipendenti") {
+            griglia.setLayout(new GridLayout(lista.size() + 1, 6));
 
-        griglia.add(new JLabel("Nome", SwingConstants.CENTER));
-        griglia.add(new JLabel("Cognome", SwingConstants.CENTER));
-        griglia.add(new JLabel("Data di nascita", SwingConstants.CENTER));
-        griglia.add(new JLabel("Stipendio", SwingConstants.CENTER));
-        griglia.add(new JLabel("Lista attività", SwingConstants.CENTER));
+            griglia.add(new JLabel("Nome", SwingConstants.CENTER));
+            griglia.add(new JLabel("Cognome", SwingConstants.CENTER));
+            griglia.add(new JLabel("Data di nascita", SwingConstants.CENTER));
+            griglia.add(new JLabel("Stipendio", SwingConstants.CENTER));
+            griglia.add(new JLabel("Lista attività", SwingConstants.CENTER));
+            griglia.add(new JLabel("", SwingConstants.CENTER));
+        }
+        else {
+            griglia.setLayout(new GridLayout(lista.size() + 1, 4));
+
+            griglia.add(new JLabel("Nome", SwingConstants.CENTER));
+            griglia.add(new JLabel("Responsabile", SwingConstants.CENTER));
+            griglia.add(new JLabel("Attività Orarie", SwingConstants.CENTER));
+            griglia.add(new JLabel("", SwingConstants.CENTER));
+        }
 
         for (Object i : lista) {
             if (i instanceof Dipendente) {
-
-                for (int j = 0; j < 5; j++) {
+                
+                
+                for (int j = 0; j < 6; j++) {
                     Dipendente dip = (Dipendente) i;
                     switch (j) {
                         case 0:
@@ -124,12 +137,40 @@ public class GrigliaDP {
                             break;
                         case 4:
                             griglia.add(new Combo(dip.getOreProgetti()));
+                            break;
+                        case 5:
+                            griglia.add(new BtnRemove(dip));
+                            break;
                         default:
                             break;
                     }
                 }
 
-            }    
+            } 
+            else {
+                System.out.println(lista.size()+1);
+
+
+                for (int j = 0; j < 4; j++) {
+                    Progetto prgt = (Progetto) i;
+
+                    switch (j) {
+                        case 0:
+                            griglia.add(new BottoniGriglia(prgt.getNome(), prgt, griglia));
+                            break;
+                        case 1:
+                            griglia.add(new BottoniGriglia(prgt.getResponsabile().toString(), prgt, griglia));
+                            break;
+                        case 2:
+                            griglia.add(new Combo(prgt.getAttivitaConQuestoProgetto())); 
+                            break;
+                        case 3:
+                            griglia.add(new BtnRemove(prgt));
+                        default:
+                            break;
+                    }
+                }
+            }   
         }
         f.add(griglia, "Center");
         //f.pack();
@@ -140,13 +181,10 @@ public class GrigliaDP {
 
 
     private void creaModale() {
-        if (tipo == "Dipendenti") {
-            frame = new JDialog(f, "Titolo", true);
-            frame.getContentPane().add(new Modale(tipo, azienda, this));
-            frame.pack();
-            frame.setVisible(true);
-
-        }
+        frame = new JDialog(f, tipo, true);
+        frame.getContentPane().add(new Modale(tipo, azienda, this));
+        frame.pack();
+        frame.setVisible(true);
     }
 
     public void aggiungiComponente() {
@@ -162,7 +200,7 @@ public class GrigliaDP {
 
         public Combo(ArrayList<AttivitaOraria> lista) {
             this.lista = lista;
-            this.setPreferredSize(new Dimension(150, 40));
+            this.setPreferredSize(new Dimension(50, 40));
             this.addActionListener(this);
             this.addItemListener(this);
             this.setVisible(true);
@@ -196,7 +234,7 @@ public class GrigliaDP {
         JPanel griglia;
 
         public BottoniGriglia(String attributo, Object oggetto, JPanel griglia) {
-            this.attributo = attributo.toString();
+            this.attributo = attributo;
             this.oggetto = oggetto;
             this.griglia = griglia;
             this.setSize(100, 50);
@@ -207,7 +245,7 @@ public class GrigliaDP {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            this.setText("dio");
+            
     
         }
 
@@ -230,6 +268,28 @@ public class GrigliaDP {
         }
     }
 
+    public class BtnRemove extends JButton implements ActionListener {
+        private Object ogg;
+
+
+        public BtnRemove(Object ogg) {
+            this.ogg = ogg;
+            this.setSize(100, 50);
+            this.setText("R");
+            this.setVisible(true);
+            this.addActionListener(this);
+        } 
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (tipo == "Dipendenti") {
+                azienda.dipendenti.remove(ogg);
+            }
+            else azienda.progetti.remove(ogg);
+            aggiungiComponente();
+        }
+    }
+
     
 
     public static void main(String[] args) {
@@ -237,9 +297,10 @@ public class GrigliaDP {
 
         Programmatore schiavo1 = new Programmatore("Giovanni", "Bianchi", LocalDate.of(2007, 12, 01), 300);
         Responsabile schiavizzatore1 = new Responsabile("Stefan", "Gherghina", LocalDate.of(2007, 12, 01), 7000, 7);
-        a.addDipendenti(schiavo1, schiavizzatore1);
-
         Progetto p1 = new Progetto(schiavizzatore1, "Sus");
+        a.addDipendenti(schiavo1, schiavizzatore1);
+        a.addProgetti(p1);
+        
 
         AttivitaOraria a1 = new AttivitaOraria(1000, "osos", LocalDate.of(2007, 12, 01), p1, schiavo1);
         AttivitaOraria a2 = new AttivitaOraria(1200, "osos", LocalDate.of(2007, 12, 01), p1, schiavo1);

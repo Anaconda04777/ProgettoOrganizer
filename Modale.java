@@ -1,11 +1,15 @@
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -18,6 +22,7 @@ public class Modale extends JPanel implements ActionListener {
     public String tipo;
     public Azienda azienda;
     public GrigliaDP GUI;
+    public JComboBox<Responsabile> comboResponsabili;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 
     public Modale(String tipo, Azienda azienda, GrigliaDP GUI) {
@@ -31,7 +36,8 @@ public class Modale extends JPanel implements ActionListener {
         }
         else {
             griglia = new JPanel();  
-            griglia.setLayout(new GridLayout(2,1));
+            griglia.setLayout(new GridLayout(2,3));
+            creaGriglia(tipo);
         } 
 
         creaBottone();
@@ -65,6 +71,34 @@ public class Modale extends JPanel implements ActionListener {
                 griglia.add(txt);
             }
         }
+        else {
+            griglia.add(new JLabel("Nome", SwingConstants.CENTER));
+            griglia.add(new JLabel("Responsabile", SwingConstants.CENTER));
+            
+            JTextField txtNome = new JTextField();
+            boxTesto.add(txtNome);
+            griglia.add(txtNome);
+
+            ArrayList<Responsabile> list = new ArrayList<Responsabile>();
+            for (Dipendente i : azienda.dipendenti) {
+                if (i.getClass().getName() == "Responsabile") {
+                    list.add((Responsabile) i);
+                }
+            }
+            
+
+            Combo box = new Combo(list);
+            comboResponsabili = box;
+            griglia.add(box);
+
+
+            /*for (int i = 0; i < 2; i++) {
+                JTextField txt = new JTextField();
+                
+                boxTesto.add(txt);
+                griglia.add(txt);
+            }*/
+        }
 
         this.add(griglia);
         
@@ -81,11 +115,50 @@ public class Modale extends JPanel implements ActionListener {
                 );
             azienda.addDipendenti(i);
             GUI.aggiungiComponente();
-
-            
+        }
+        else {
+            System.out.println((Responsabile) comboResponsabili.getSelectedItem());
+            Progetto i = new Progetto((Responsabile) comboResponsabili.getSelectedItem(), boxTesto.get(0).getText());
+            azienda.addProgetti(i);
+            GUI.aggiungiComponente();
         }
         
     }
+    
+    public class Combo extends JComboBox<Responsabile> implements ActionListener, ItemListener {
+        private ArrayList<Responsabile> resp;
 
+        public Combo(ArrayList<Responsabile> resp) {
+            this.resp = resp;
+            this.setPreferredSize(new Dimension(150, 40));
+            this.addActionListener(this);
+            this.addItemListener(this);
+            this.setVisible(true);
 
+            addIt();
+        }
+        
+        private void addIt() {
+            for (Responsabile i : resp) {
+                this.addItem(i);   
+            }
+            
+        }
+         
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            
+            
+        }
+    
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //System.out.println(((JComboBox<Responsabile>) e.getSource()).getSelectedItem());
+            
+        }
+
+    
+    }
+
+    
 }
