@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import javax.swing.*;
 
 public class GrigliaDP {
+    public JFrame home;
     public JFrame f;
     public JButton btnNuovo;
     public JButton btnMenu;
@@ -20,7 +21,8 @@ public class GrigliaDP {
     public Azienda azienda;
     public JPanel pannello;
 
-    public GrigliaDP(String tipo, Azienda azienda) {
+    public GrigliaDP(String tipo, Azienda azienda, JFrame home) {
+        this.home = home;
         this.azienda = azienda;
         this.tipo = tipo;
         impostazione();
@@ -72,8 +74,6 @@ public class GrigliaDP {
        
 
     }
-
-
 
     private void listaDaIstanziare(Azienda azienda) {
         System.out.println(tipo);
@@ -263,7 +263,9 @@ public class GrigliaDP {
     public class ActionListenerMenu implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            
+            f.setVisible(false);
+            home.setVisible(true);
+
     
         }
     }
@@ -292,31 +294,7 @@ public class GrigliaDP {
 
     
 
-    public static void main(String[] args) {
-        Azienda a = new Azienda("Sos");
-
-        Programmatore schiavo1 = new Programmatore("Giovanni", "Bianchi", LocalDate.of(2007, 12, 01), 300);
-        Responsabile schiavizzatore1 = new Responsabile("Stefan", "Gherghina", LocalDate.of(2007, 12, 01), 7000, 7);
-        Progetto p1 = new Progetto(schiavizzatore1, "Sus");
-        a.addDipendenti(schiavo1, schiavizzatore1);
-        a.addProgetti(p1);
-        
-
-        AttivitaOraria a1 = new AttivitaOraria(1000, "osos", LocalDate.of(2007, 12, 01), p1, schiavo1);
-        AttivitaOraria a2 = new AttivitaOraria(1200, "osos", LocalDate.of(2007, 12, 01), p1, schiavo1);
-        AttivitaOraria a3 = new AttivitaOraria(1300, "osos", LocalDate.of(2007, 12, 01), p1, schiavo1);
-        AttivitaOraria a4 = new AttivitaOraria(1400, "osos", LocalDate.of(2007, 12, 01), p1, schiavo1);
-
-        AttivitaOraria a5 = new AttivitaOraria(1000, "osos", LocalDate.of(2007, 12, 01), p1, schiavizzatore1);
-        AttivitaOraria a6 = new AttivitaOraria(1200, "osos", LocalDate.of(2007, 12, 01), p1, schiavizzatore1);
-        AttivitaOraria a7 = new AttivitaOraria(1300, "osos", LocalDate.of(2007, 12, 01), p1, schiavizzatore1);
-        AttivitaOraria a8 = new AttivitaOraria(1400, "osos", LocalDate.of(2007, 12, 01), p1, schiavizzatore1);
-        
-
-
-        GrigliaDP i = new GrigliaDP("Dipendenti", a);
-        
-    }
+    
 
 }
 
