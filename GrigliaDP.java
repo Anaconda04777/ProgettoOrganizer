@@ -85,7 +85,6 @@ public class GrigliaDP {
         }
         else {
             progetti = azienda.progetti;
-            System.out.println("dio");
             creaGriglia(progetti);
         }
     }
@@ -277,7 +276,7 @@ public class GrigliaDP {
         public BtnRemove(Object ogg) {
             this.ogg = ogg;
             this.setSize(100, 50);
-            this.setText("R");
+            this.setText("Remove");
             this.setVisible(true);
             this.addActionListener(this);
         } 

@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.*;
 import javax.swing.BorderFactory;
 
 public class Home {
@@ -19,9 +20,9 @@ public class Home {
     public JLabel titolo; // label titolo
 
     public JButton btnProgetti; // bottone 1
-    public JButton btnDipendenti; // bottone 2
+    public JButton btnDipendenti; // botton
 
-    private Image img;
+
 
     public Home(Azienda a) {
         this.a = a;
@@ -31,7 +32,7 @@ public class Home {
         f.addWindowListener(new GestoreFinestre());
         f.setLayout(new GridBagLayout());
         creaObj();
-        f.setSize(300, 300);
+        f.setSize(500, 400);
         f.setVisible(true); // visualizzazione
 
 
@@ -39,18 +40,20 @@ public class Home {
     }
 
     private void creaObj() {
-        JPanel pannelloPrincipale =new JPanel();
+        JPanel pannelloPrincipale = new JPanel();
         JPanel pannelloBottoni = new JPanel();
-
-        titolo = new JLabel("Organizer");
         
+        titolo = new JLabel("Organizer");
+        titolo.setFont(new Font("Monospaced", Font.PLAIN, 40));
+
         btnProgetti = new JButton("Progetti");
         btnDipendenti = new JButton("Dipendenti");
         btnProgetti.addActionListener(new ActionListenerProgetti());
         btnDipendenti.addActionListener(new ActionListenerDipendenti());
 
-        pannelloPrincipale.setLayout(new BoxLayout(pannelloPrincipale, BoxLayout.PAGE_AXIS));
-        pannelloBottoni.setLayout(new BoxLayout(pannelloBottoni, BoxLayout.X_AXIS));
+        //pannelloPrincipale.setLayout(new BoxLayout(pannelloPrincipale, BoxLayout.Y_AXIS));
+        //pannelloBottoni.setLayout(new BoxLayout(pannelloBottoni, BoxLayout.X_AXIS));
+        
 
         pannelloBottoni.add(btnProgetti);
         pannelloBottoni.add(btnDipendenti);
