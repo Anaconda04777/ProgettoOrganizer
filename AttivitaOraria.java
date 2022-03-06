@@ -7,7 +7,8 @@ public class AttivitaOraria {
     protected Progetto progettoCorrente;
     protected Dipendente dipendenteAssociato;
     
-    public AttivitaOraria(int durata, String descrizione, LocalDate dataSvolgimento, Progetto progettoCorrente, Dipendente dipendenteAssociato) {
+    public AttivitaOraria(int durata, String descrizione, LocalDate dataSvolgimento, 
+            Progetto progettoCorrente, Dipendente dipendenteAssociato) {
         this.durata = durata;
         this.descrizione = descrizione;
         this.dataSvolgimento = dataSvolgimento;

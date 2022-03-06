@@ -79,9 +79,14 @@ public class GrigliaDP {
         System.out.println(tipo);
         ArrayList<Dipendente> dipendenti;
         ArrayList<Progetto> progetti;
+        ArrayList<AttivitaOraria> attivita;
         if (tipo == "Dipendenti") {
             dipendenti = azienda.dipendenti;
             creaGriglia(dipendenti);
+        }
+        else if (tipo == "Attivita") {
+            attivita = azienda.attivita;
+            creaGriglia(attivita);
         }
         else {
             progetti = azienda.progetti;
@@ -105,6 +110,16 @@ public class GrigliaDP {
             griglia.add(new JLabel("Lista attività", SwingConstants.CENTER));
             griglia.add(new JLabel("", SwingConstants.CENTER));
         }
+        else if (tipo == "Attivita") {
+            griglia.setLayout(new GridLayout(lista.size() + 1, 6));
+
+            griglia.add(new JLabel("Durata", SwingConstants.CENTER));
+            griglia.add(new JLabel("Descrizione", SwingConstants.CENTER));
+            griglia.add(new JLabel("Data Svolgimento", SwingConstants.CENTER));
+            griglia.add(new JLabel("Progetto", SwingConstants.CENTER));
+            griglia.add(new JLabel("Dipendente", SwingConstants.CENTER));
+            griglia.add(new JLabel("", SwingConstants.CENTER));
+        }
         else {
             griglia.setLayout(new GridLayout(lista.size() + 1, 4));
 
@@ -122,7 +137,6 @@ public class GrigliaDP {
                     Dipendente dip = (Dipendente) i;
                     switch (j) {
                         case 0:
-                            System.out.println("ciao");
                             griglia.add(new BottoniGriglia(dip.getNome(), dip, griglia));
                             break;
                         case 1:
@@ -132,6 +146,7 @@ public class GrigliaDP {
                             griglia.add(new BottoniGriglia(dip.getDataNascita().toString(), dip, griglia));
                             break;
                         case 3:
+                            
                             griglia.add(new BottoniGriglia(dip.getStipendio() + "", dip, griglia));
                             break;
                         case 4:
@@ -146,6 +161,35 @@ public class GrigliaDP {
                 }
 
             } 
+            else if (i instanceof AttivitaOraria) {
+                for (int j = 0; j < 6; j++) {
+                    AttivitaOraria att = (AttivitaOraria) i;
+                    switch (j) {
+                        case 0:
+                            System.out.println("ciao");
+                            griglia.add(new BottoniGriglia(att.getDurata() + "", att, griglia));
+                            break;
+                        case 1:
+                            griglia.add(new BottoniGriglia(att.getDescrizione(), att, griglia));
+                            break;
+                        case 2:
+                            
+                            griglia.add(new BottoniGriglia(att.getDataSvolgimento().toString(), att, griglia));
+                            break;
+                        case 3:
+                            griglia.add(new BottoniGriglia(att.getProgettoCorrente().toString(), att, griglia));
+                            break;
+                        case 4:
+                            griglia.add(new BottoniGriglia(att.getDipendenteAssociato().toString(), att, griglia));
+                            break;
+                        case 5:
+                            griglia.add(new BtnRemove(att));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
             else {
                 System.out.println(lista.size()+1);
 
@@ -171,6 +215,7 @@ public class GrigliaDP {
                 }
             }   
         }
+
         f.add(griglia, "Center");
         //f.pack();
         creaPulsanti();
@@ -190,14 +235,24 @@ public class GrigliaDP {
         f.remove(griglia);
         f.remove(pannello);
         listaDaIstanziare(azienda);
+
+        try {
+            frame.dispose();
+        } catch (Exception e) {
+            //TODO: handle exception
+        }
+
         f.pack();
-        frame.dispose();
+        f.setSize(700, 200);
+        
+        
+        
     }
 
-    public class Combo extends JComboBox<AttivitaOraria> implements ActionListener, ItemListener {
-        ArrayList<AttivitaOraria> lista;
+    public class Combo extends JComboBox<Object> implements ActionListener, ItemListener {
+        ArrayList<?> lista;
 
-        public Combo(ArrayList<AttivitaOraria> lista) {
+        public Combo(ArrayList<?> lista) {
             this.lista = lista;
             this.setPreferredSize(new Dimension(50, 40));
             this.addActionListener(this);
@@ -208,7 +263,7 @@ public class GrigliaDP {
         }
         
         private void addIt() {
-            for (AttivitaOraria i : lista) {
+            for (Object i : lista) {
                 this.addItem(i);   
             }
             
@@ -216,13 +271,12 @@ public class GrigliaDP {
          
         @Override
         public void itemStateChanged(ItemEvent e) {
-            // TODO Auto-generated method stub
             
         }
     
         @Override
         public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
+
             
         }
     }
@@ -244,8 +298,7 @@ public class GrigliaDP {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            
-    
+            JOptionPane.showMessageDialog(f,((BottoniGriglia) e.getSource()).getText());
         }
 
     
@@ -286,7 +339,11 @@ public class GrigliaDP {
             if (tipo == "Dipendenti") {
                 azienda.dipendenti.remove(ogg);
             }
+            else if (tipo == "Attivita") {
+                azienda.attivita.remove(ogg);
+            }
             else azienda.progetti.remove(ogg);
+
             aggiungiComponente();
         }
     }

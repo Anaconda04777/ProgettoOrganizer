@@ -21,6 +21,7 @@ public class Home {
 
     public JButton btnProgetti; // bottone 1
     public JButton btnDipendenti; // botton
+    public JButton btnAttivita;
 
 
 
@@ -32,7 +33,7 @@ public class Home {
         f.addWindowListener(new GestoreFinestre());
         f.setLayout(new GridBagLayout());
         creaObj();
-        f.setSize(500, 400);
+        f.setSize(600, 400);
         f.setVisible(true); // visualizzazione
 
 
@@ -48,8 +49,11 @@ public class Home {
 
         btnProgetti = new JButton("Progetti");
         btnDipendenti = new JButton("Dipendenti");
+        btnAttivita = new JButton("Attività");
         btnProgetti.addActionListener(new ActionListenerProgetti());
         btnDipendenti.addActionListener(new ActionListenerDipendenti());
+        btnAttivita.addActionListener(new ActionListenerAttivita());
+
 
         //pannelloPrincipale.setLayout(new BoxLayout(pannelloPrincipale, BoxLayout.Y_AXIS));
         //pannelloBottoni.setLayout(new BoxLayout(pannelloBottoni, BoxLayout.X_AXIS));
@@ -57,7 +61,7 @@ public class Home {
 
         pannelloBottoni.add(btnProgetti);
         pannelloBottoni.add(btnDipendenti);
-
+        pannelloBottoni.add(btnAttivita);
 
 
         pannelloPrincipale.add(titolo);
@@ -81,6 +85,13 @@ public class Home {
         @Override
         public void actionPerformed(ActionEvent e) {
             GrigliaDP i = new GrigliaDP("Dipendenti", a, f);
+            f.setVisible(false);
+        }
+    }
+    public class ActionListenerAttivita implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            GrigliaDP i = new GrigliaDP("Attivita", a, f);
             f.setVisible(false);
         }
     }
@@ -108,6 +119,7 @@ public class Home {
         AttivitaOraria a7 = new AttivitaOraria(1300, "osos", LocalDate.of(2007, 12, 01), p1, schiavizzatore1);
         AttivitaOraria a8 = new AttivitaOraria(1400, "osos", LocalDate.of(2007, 12, 01), p1, schiavizzatore1);
         
+        a.addAttivita(a1,a2,a3,a4,a5,a6,a7,a8);
         Home h = new Home(a);
 
         

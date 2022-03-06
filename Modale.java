@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.*;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,20 +24,28 @@ public class Modale extends JPanel implements ActionListener {
     public String tipo;
     public Azienda azienda;
     public GrigliaDP GUI;
-    public JComboBox<Responsabile> comboResponsabili;
+
+
+    public JCheckBox ruolo;
+    public JComboBox<Object> comboResponsabili;
+    public JComboBox<Object> comboProgetti;
+    public JComboBox<Object> comboDipendenti;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 
     public Modale(String tipo, Azienda azienda, GrigliaDP GUI) {
         this.GUI = GUI;
         this.tipo = tipo;
         this.azienda = azienda;
+        griglia = new JPanel();
         if (tipo == "Dipendenti") {
-            griglia = new JPanel();
-            griglia.setLayout(new GridLayout(2,4));
+            griglia.setLayout(new GridLayout(2,5));
             creaGriglia(tipo);
         }
-        else {
-            griglia = new JPanel();  
+        else if (tipo == "Attivita") {
+            griglia.setLayout(new GridLayout(2,5));
+            creaGriglia(tipo);
+        }
+        else { 
             griglia.setLayout(new GridLayout(2,3));
             creaGriglia(tipo);
         } 
@@ -63,13 +73,40 @@ public class Modale extends JPanel implements ActionListener {
             griglia.add(new JLabel("Cognome", SwingConstants.CENTER));
             griglia.add(new JLabel("Data di nascita", SwingConstants.CENTER));
             griglia.add(new JLabel("Stipendio", SwingConstants.CENTER));
-            
+            griglia.add(new JLabel("", SwingConstants.CENTER));
+
             for (int i = 0; i < 4; i++) {
                 JTextField txt = new JTextField();
                 
                 boxTesto.add(txt);
                 griglia.add(txt);
             }
+
+            ruolo = new JCheckBox("Responsabile?");
+            griglia.add(ruolo);
+        }   
+        else if (tipo == "Attivita") {
+            griglia.add(new JLabel("Durata", SwingConstants.CENTER));
+            griglia.add(new JLabel("Descrizione", SwingConstants.CENTER));
+            griglia.add(new JLabel("Data Svolgimento", SwingConstants.CENTER));
+            griglia.add(new JLabel("Progetto", SwingConstants.CENTER));
+            griglia.add(new JLabel("Dipendente", SwingConstants.CENTER));
+
+            for (int i = 0; i < 3; i++) {
+                JTextField txt = new JTextField();
+                
+                boxTesto.add(txt);
+                griglia.add(txt);
+            }
+
+            ArrayList<?> progetto = azienda.progetti;
+            comboProgetti = new Combo((ArrayList<Object>) progetto);
+            griglia.add(comboProgetti);
+
+            ArrayList<?> dipendente = azienda.dipendenti;
+            comboDipendenti = new Combo((ArrayList<Object>) dipendente);
+            griglia.add(comboDipendenti);
+
         }
         else {
             griglia.add(new JLabel("Nome", SwingConstants.CENTER));
@@ -79,25 +116,17 @@ public class Modale extends JPanel implements ActionListener {
             boxTesto.add(txtNome);
             griglia.add(txtNome);
 
-            ArrayList<Responsabile> list = new ArrayList<Responsabile>();
+            ArrayList<Object> list = new ArrayList<Object>();
             for (Dipendente i : azienda.dipendenti) {
                 if (i.getClass().getName() == "Responsabile") {
-                    list.add((Responsabile) i);
+                    list.add(i);
                 }
             }
             
 
-            Combo box = new Combo(list);
-            comboResponsabili = box;
-            griglia.add(box);
-
-
-            /*for (int i = 0; i < 2; i++) {
-                JTextField txt = new JTextField();
-                
-                boxTesto.add(txt);
-                griglia.add(txt);
-            }*/
+           comboResponsabili = new Combo(list);
+           griglia.add(comboResponsabili);
+           
         }
 
         this.add(griglia);
@@ -108,27 +137,61 @@ public class Modale extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (tipo == "Dipendenti") {
-            Dipendente i = new Programmatore(boxTesto.get(0).getText(), 
+            Dipendente i;
+            if (ruolo.isSelected()) {
+                i = new Responsabile(boxTesto.get(0).getText(), 
+                boxTesto.get(1).getText(), 
+                LocalDate.parse(boxTesto.get(2).getText(), formatter) , 
+                Integer.parseInt(boxTesto.get(3).getText()) 
+                );
+            }
+            else {
+                i = new Programmatore(boxTesto.get(0).getText(), 
+                boxTesto.get(1).getText(), 
+                LocalDate.parse(boxTesto.get(2).getText(), formatter) , 
+                Integer.parseInt(boxTesto.get(3).getText()) 
+                );
+            }
+
+            azienda.addDipendenti(i);
+            
+            
+        }
+        else if (tipo == "Attivita") {
+            AttivitaOraria i = new AttivitaOraria(Integer.parseInt(boxTesto.get(0).getText()), 
                     boxTesto.get(1).getText(), 
                     LocalDate.parse(boxTesto.get(2).getText(), formatter) , 
-                    Integer.parseInt(boxTesto.get(3).getText()) 
+                    (Progetto) comboProgetti.getSelectedItem(), 
+                    (Dipendente) comboDipendenti.getSelectedItem()
                 );
-            azienda.addDipendenti(i);
-            GUI.aggiungiComponente();
+            azienda.addAttivita(i);
+            
         }
         else {
             System.out.println((Responsabile) comboResponsabili.getSelectedItem());
             Progetto i = new Progetto((Responsabile) comboResponsabili.getSelectedItem(), boxTesto.get(0).getText());
             azienda.addProgetti(i);
-            GUI.aggiungiComponente();
+            
         }
-        
+        GUI.aggiungiComponente();
     }
     
-    public class Combo extends JComboBox<Responsabile> implements ActionListener, ItemListener {
-        private ArrayList<Responsabile> resp;
+    /* controllo non funziona diventa sempre null
+    private LocalDate erroreData() {
+        try {
+            return LocalDate.parse(boxTesto.get(2).getText(), formatter);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Inserisci correttamente la data: gg/mm/yyyy");
+            return null;
+        }
+        
+    }*/
 
-        public Combo(ArrayList<Responsabile> resp) {
+
+    public class Combo extends JComboBox<Object> implements ActionListener, ItemListener {
+        private ArrayList<?> resp;
+
+        public Combo(ArrayList<Object> resp) {
             this.resp = resp;
             this.setPreferredSize(new Dimension(150, 40));
             this.addActionListener(this);
@@ -139,7 +202,7 @@ public class Modale extends JPanel implements ActionListener {
         }
         
         private void addIt() {
-            for (Responsabile i : resp) {
+            for (Object i : resp) {
                 this.addItem(i);   
             }
             
